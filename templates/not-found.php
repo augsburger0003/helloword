@@ -22,6 +22,10 @@ $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOT
                 <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
                 <span><?= $escape($data['appName']) ?></span>
             </a>
+            <nav class="main-nav" aria-label="Navegação principal">
+                <a href="/sobre">Sobre</a>
+                <a href="/contato">Contato</a>
+            </nav>
         </header>
         <main class="not-found">
             <p class="eyebrow"><span>404</span> caminho não encontrado</p>

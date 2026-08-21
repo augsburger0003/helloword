@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * @var array<string, string> $data
+ * @var array<string, mixed> $data
  */
 $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 ?>
@@ -23,6 +23,11 @@ $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOT
                 <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
                 <span><?= $escape($data['appName']) ?></span>
             </a>
+            <nav class="main-nav" aria-label="Navegação principal">
+                <a href="/sobre">Sobre</a>
+                <a href="/contato">Contato</a>
+                <a href="/api/status">API <span aria-hidden="true">↗</span></a>
+            </nav>
             <div class="header-meta">
                 <span class="status-dot" aria-hidden="true"></span>
                 <span>PHP starter</span>
@@ -95,9 +100,27 @@ $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOT
                 <article class="feature-card">
                     <span class="feature-number">03</span>
                     <div class="feature-icon" aria-hidden="true">⌘</div>
-                    <h3>Sem dependências</h3>
-                    <p>Funciona com o servidor embutido do PHP, sem instalação adicional para ver a primeira tela.</p>
+                    <h3>Mais possibilidades</h3>
+                    <p>Inclui páginas internas, formulário validado no servidor e endpoint JSON para continuar evoluindo.</p>
                 </article>
+            </section>
+
+            <section class="route-section" aria-labelledby="routes-title">
+                <div class="section-heading">
+                    <p class="eyebrow"><span>04</span> próximos caminhos</p>
+                    <h2 id="routes-title">Uma base para<br><em>ir além.</em></h2>
+                </div>
+                <div class="route-list">
+                    <?php foreach ($data['routes'] as $route): ?>
+                        <a class="route-item" href="<?= $escape($route['path']) ?>">
+                            <span>
+                                <strong><?= $escape($route['label']) ?></strong>
+                                <small><?= $escape($route['description']) ?></small>
+                            </span>
+                            <span class="route-arrow" aria-hidden="true">↗</span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
             </section>
         </main>
 
