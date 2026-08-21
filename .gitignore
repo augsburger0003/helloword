@@ -1,0 +1,5 @@
+/vendor/
+.env
+.env.local
+.phpunit.result.cache
+.DS_Store
