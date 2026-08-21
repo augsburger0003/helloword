@@ -46,6 +46,41 @@ final class Seeder
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
+
+            $ideas = $pdo->prepare(
+                'INSERT OR IGNORE INTO ideas
+                    (seed_key, name, email, content, status, created_at, updated_at)
+                 VALUES (:seed_key, :name, :email, :content, :status, :created_at, :updated_at)'
+            );
+
+            foreach ([
+                [
+                    'seed_key' => 'welcome-idea-1',
+                    'name' => 'Ana',
+                    'email' => null,
+                    'content' => 'Uma área para compartilhar ideias deixa o projeto mais vivo.',
+                ],
+                [
+                    'seed_key' => 'welcome-idea-2',
+                    'name' => 'Rafael',
+                    'email' => null,
+                    'content' => 'Seria ótimo acompanhar a evolução das próximas versões.',
+                ],
+                [
+                    'seed_key' => 'welcome-idea-3',
+                    'name' => 'Lia',
+                    'email' => null,
+                    'content' => 'A base está simples e pronta para ganhar novas funcionalidades.',
+                ],
+            ] as $idea) {
+                $ideas->execute([
+                    ...$idea,
+                    'status' => 'published',
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+            }
+
             $pdo->commit();
         } catch (\Throwable $exception) {
             if ($pdo->inTransaction()) {

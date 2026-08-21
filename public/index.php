@@ -15,9 +15,79 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
 header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'");
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 
 if ($path === '/health') {
     Response::json($application->health());
+}
+
+if ($path === '/api/stats' && $method === 'GET') {
+    Response::json([
+        'status' => 'ok',
+        'data' => $application->stats(),
+    ]);
+}
+
+if ($path === '/api/ideas') {
+    if ($method === 'GET') {
+        Response::json([
+            'status' => 'ok',
+            'data' => $application->ideas(50),
+            'stats' => $application->stats(),
+        ]);
+    }
+
+    if ($method === 'POST') {
+        $input = $_POST;
+        $contentType = strtolower($_SERVER['CONTENT_TYPE'] ?? '');
+
+        if (str_contains($contentType, 'application/json')) {
+            try {
+                $decoded = json_decode(
+                    (string) file_get_contents('php://input'),
+                    true,
+                    512,
+                    JSON_THROW_ON_ERROR
+                );
+            } catch (\JsonException) {
+                Response::json([
+                    'status' => 'error',
+                    'message' => 'O corpo da requisição precisa ser um JSON válido.',
+                ], 400);
+            }
+
+            $input = is_array($decoded ?? null) ? $decoded : [];
+        }
+
+        try {
+            Response::json([
+                'status' => 'ok',
+                'data' => $application->createIdea($input),
+            ], 201);
+        } catch (\InvalidArgumentException $exception) {
+            Response::json([
+                'status' => 'error',
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+    }
+
+    header('Allow: GET, POST');
+    Response::json([
+        'status' => 'error',
+        'message' => 'Método não permitido.',
+    ], 405);
+}
+
+if ($path === '/ideas' && $method === 'POST') {
+    try {
+        $application->createIdea($_POST);
+        header('Location: /?idea=created#ideias', true, 303);
+    } catch (\InvalidArgumentException) {
+        header('Location: /?idea=invalid#ideias', true, 303);
+    }
+
+    exit;
 }
 
 if ($path !== '/') {
@@ -31,9 +101,17 @@ $page = $application->home();
 $health = $application->health();
 $settings = $page['settings'];
 $message = $page['message'];
+$ideas = $page['ideas'];
+$stats = $page['stats'];
 $environment = $page['environment'];
+$feedback = $_GET['idea'] ?? '';
 
 $escape = static fn (mixed $value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+$formatDate = static function (mixed $value): string {
+    $timestamp = strtotime((string) $value);
+
+    return $timestamp === false ? 'agora' : date('d/m/Y', $timestamp);
+};
 header('Content-Type: text/html; charset=utf-8');
 ?>
 <!DOCTYPE html>
@@ -280,6 +358,53 @@ header('Content-Type: text/html; charset=utf-8');
         .feature h2 { font-size: .88rem; margin: 0 0 4px; }
         .feature p { color: var(--muted); font-size: .77rem; margin: 0; }
 
+        .ideas {
+            background: rgba(255, 255, 255, .62);
+            border: 1px solid rgba(196, 216, 227, .8);
+            border-radius: 20px;
+            display: grid;
+            gap: 42px;
+            grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+            margin-bottom: 52px;
+            padding: 32px;
+        }
+        .ideas h2 { font-size: 1.55rem; letter-spacing: -.04em; margin: 0 0 8px; }
+        .ideas-intro { color: var(--muted); font-size: .88rem; margin: 0 0 22px; max-width: 380px; }
+        .idea-stats { color: var(--muted); display: flex; font-size: .76rem; gap: 20px; margin: 0; }
+        .idea-stats strong { color: var(--ink); display: block; font-size: 1.15rem; }
+        .idea-form { display: grid; gap: 12px; }
+        .idea-form label { color: var(--ink); font-size: .75rem; font-weight: 750; }
+        .idea-form input, .idea-form textarea {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            color: var(--ink);
+            font: inherit;
+            font-size: .84rem;
+            padding: 10px 12px;
+            width: 100%;
+        }
+        .idea-form textarea { min-height: 86px; resize: vertical; }
+        .idea-form input:focus, .idea-form textarea:focus { border-color: var(--blue); outline: 3px solid rgba(40, 119, 211, .14); }
+        .idea-form small { color: var(--muted); font-size: .7rem; margin-top: -4px; }
+        .idea-form .button { border: 0; cursor: pointer; justify-self: start; }
+        .feedback { border-radius: 7px; font-size: .78rem; margin: 0 0 16px; padding: 10px 12px; }
+        .feedback.success { background: #e6f7ee; color: #27764e; }
+        .feedback.error { background: #fff0ed; color: #9c3d2d; }
+        .idea-list { display: grid; gap: 12px; grid-column: 1 / -1; }
+        .idea-list h3 { font-size: .76rem; letter-spacing: .1em; margin: 0 0 2px; text-transform: uppercase; }
+        .idea {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .idea p { color: var(--muted); font-size: .82rem; margin: 5px 0 0; }
+        .idea-meta { align-items: center; display: flex; font-size: .74rem; justify-content: space-between; }
+        .idea-meta strong { color: var(--ink); }
+        .idea-meta time { color: #91a1aa; }
+        .empty-ideas { color: var(--muted); font-size: .82rem; margin: 8px 0 0; }
+
         footer { color: #8396a2; display: flex; font-size: .75rem; justify-content: space-between; padding-bottom: 26px; }
         footer span:last-child { color: #a6b5bd; }
 
@@ -289,6 +414,7 @@ header('Content-Type: text/html; charset=utf-8');
             .hero { gap: 45px; grid-template-columns: 1fr; min-height: auto; padding-bottom: 64px; padding-top: 42px; }
             h1 { font-size: clamp(3.2rem, 16vw, 5rem); }
             .features { grid-template-columns: 1fr; }
+            .ideas { gap: 28px; grid-template-columns: 1fr; padding: 22px; }
             footer { gap: 12px; flex-direction: column; }
         }
     </style>
@@ -346,6 +472,63 @@ header('Content-Type: text/html; charset=utf-8');
                 <span class="feature-icon">✓</span>
                 <div><h2>Persistência local</h2><p>SQLite inicializado automaticamente.</p></div>
             </article>
+        </section>
+
+        <section class="ideas" id="ideias" aria-labelledby="ideas-title">
+            <div>
+                <p class="eyebrow">Colaboração</p>
+                <h2 id="ideas-title">Deixe uma ideia</h2>
+                <p class="ideas-intro">
+                    Uma funcionalidade real para demonstrar entrada de dados,
+                    validação e persistência no SQLite.
+                </p>
+                <p class="idea-stats">
+                    <span><strong><?= $escape($stats['total']) ?></strong> ideias publicadas</span>
+                    <span><strong><?= $escape($stats['today']) ?></strong> hoje</span>
+                </p>
+            </div>
+
+            <div>
+                <?php if ($feedback === 'created'): ?>
+                    <p class="feedback success" role="status">Ideia publicada. Obrigado por participar!</p>
+                <?php elseif ($feedback === 'invalid'): ?>
+                    <p class="feedback error" role="alert">Revise os campos e tente novamente.</p>
+                <?php endif; ?>
+
+                <form class="idea-form" action="/ideas" method="post">
+                    <div>
+                        <label for="idea-name">Seu nome</label>
+                        <input id="idea-name" name="name" type="text" required minlength="2" maxlength="80" autocomplete="name">
+                    </div>
+                    <div>
+                        <label for="idea-email">E-mail <small>(opcional)</small></label>
+                        <input id="idea-email" name="email" type="email" maxlength="160" autocomplete="email">
+                    </div>
+                    <div>
+                        <label for="idea-content">Sua ideia</label>
+                        <textarea id="idea-content" name="content" required minlength="5" maxlength="500"></textarea>
+                        <small>Conte em até 500 caracteres o que você gostaria de ver por aqui.</small>
+                    </div>
+                    <button class="button" type="submit">Publicar ideia</button>
+                </form>
+            </div>
+
+            <div class="idea-list">
+                <h3>Contribuições recentes</h3>
+                <?php if ($ideas === []): ?>
+                    <p class="empty-ideas">Ainda não há contribuições. Seja o primeiro!</p>
+                <?php else: ?>
+                    <?php foreach ($ideas as $idea): ?>
+                        <article class="idea">
+                            <div class="idea-meta">
+                                <strong><?= $escape($idea['name']) ?></strong>
+                                <time datetime="<?= $escape($idea['created_at']) ?>"><?= $escape($formatDate($idea['created_at'])) ?></time>
+                            </div>
+                            <p><?= nl2br($escape($idea['content'])) ?></p>
+                        </article>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
         </section>
     </main>
 
