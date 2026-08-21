@@ -20,7 +20,9 @@ final class Application
      */
     public function handle(string $path): array
     {
-        $path = rtrim($path, '/') ?: '/';
+        $parsedPath = parse_url($path, PHP_URL_PATH);
+        $path = is_string($parsedPath) && $parsedPath !== '' ? $parsedPath : '/';
+        $path = '/' . ltrim(rtrim($path, '/'), '/');
 
         if ($path === '/') {
             return [
@@ -51,6 +53,7 @@ final class Application
             'environment' => $this->config['environment'],
             'phpVersion' => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
             'serverTime' => date('H:i'),
+            'year' => date('Y'),
         ];
     }
 }

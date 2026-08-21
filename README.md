@@ -8,7 +8,7 @@ roteamento mínimo, configuração separada e uma interface responsiva em
 ## Requisitos
 
 - PHP 8.1 ou superior
-- Composer (opcional; útil apenas para os scripts e o autoload do projeto)
+- Composer (opcional; habilita o autoload PSR-4 e o script `serve`)
 
 ## Inicialização
 
@@ -27,9 +27,14 @@ Com Composer, o mesmo fluxo pode ser iniciado por:
 composer serve
 ```
 
+O Composer não é obrigatório: o front controller possui um fallback para o
+autoload manual da classe de aplicação, permitindo iniciar o projeto em um
+ambiente limpo sem instalar dependências.
+
 ## Estrutura
 
 ```text
+composer.json         Manifest, autoload PSR-4 e script de desenvolvimento
 config/app.php       Configuração da aplicação
 public/index.php     Ponto de entrada HTTP
 public/assets/       Folha de estilos da interface

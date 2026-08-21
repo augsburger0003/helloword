@@ -102,7 +102,7 @@ $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOT
         </main>
 
         <footer class="site-footer">
-            <span><?= $escape($data['appName']) ?> <span class="footer-slash">/</span> 2024</span>
+            <span><?= $escape($data['appName']) ?> <span class="footer-slash">/</span> <?= $escape($data['year']) ?></span>
             <span>feito para começar</span>
         </footer>
     </div>
