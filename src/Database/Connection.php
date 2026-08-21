@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Database;
 
 use PDO;
+use RuntimeException;
 
 final class Connection
 {
@@ -16,13 +17,17 @@ final class Connection
         $directory = dirname($path);
 
         if (!is_dir($directory)) {
-            mkdir($directory, 0775, true);
+            if (!mkdir($directory, 0775, true) && !is_dir($directory)) {
+                throw new RuntimeException("Não foi possível criar o diretório do banco: {$directory}");
+            }
         }
 
         $this->pdo = new PDO('sqlite:' . $path);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $this->pdo->setAttribute(PDO::ATTR_TIMEOUT, 5);
         $this->pdo->exec('PRAGMA foreign_keys = ON');
+        $this->pdo->exec('PRAGMA busy_timeout = 5000');
     }
 
     public function pdo(): PDO

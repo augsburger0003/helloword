@@ -44,6 +44,8 @@ final class Env
 
     public static function get(string $key, ?string $default = null): ?string
     {
-        return self::$values[$key] ?? $_ENV[$key] ?? $_SERVER[$key] ?? $default;
+        // Variáveis injetadas pelo ambiente têm precedência sobre o arquivo
+        // local, permitindo configurar produção sem editar o código.
+        return $_ENV[$key] ?? $_SERVER[$key] ?? self::$values[$key] ?? $default;
     }
 }

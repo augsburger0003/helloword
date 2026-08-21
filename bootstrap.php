@@ -25,6 +25,12 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
-$database = new Connection(App\Support\Env::get('DB_DATABASE', 'storage/helloword.sqlite'));
+$databasePath = App\Support\Env::get('DB_DATABASE');
+
+if ($databasePath === null || trim($databasePath) === '') {
+    $databasePath = 'storage/helloword.sqlite';
+}
+
+$database = new Connection($databasePath);
 (new Migrator($database, __DIR__ . '/database/migrations'))->run();
 (new Seeder($database))->run();

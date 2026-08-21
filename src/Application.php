@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App;
 
 use App\Database\Connection;
+use App\Support\Clock;
+use App\Support\Env;
 
 final class Application
 {
@@ -33,7 +35,22 @@ final class Application
                 'body' => 'A aplicação está pronta.',
                 'author' => 'Helloword',
             ],
-            'environment' => \App\Support\Env::get('APP_ENV', 'local') ?? 'local',
+            'environment' => Env::get('APP_ENV') ?: 'local',
+        ];
+    }
+
+    /** @return array{status: string, application: string, database: string, migrations: int, checked_at: string} */
+    public function health(): array
+    {
+        $this->connection->one('SELECT 1 AS ready');
+        $migrationRow = $this->connection->one('SELECT COUNT(*) AS total FROM migrations');
+
+        return [
+            'status' => 'ok',
+            'application' => Env::get('APP_NAME') ?: 'Helloword',
+            'database' => 'sqlite',
+            'migrations' => (int) ($migrationRow['total'] ?? 0),
+            'checked_at' => Clock::now(),
         ];
     }
 }

@@ -3,15 +3,38 @@
 declare(strict_types=1);
 
 use App\Application;
+use App\Http\Response;
 
 require dirname(__DIR__) . '/bootstrap.php';
 
-$page = (new Application($database))->home();
+$application = new Application($database);
+
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'");
+
+$path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+
+if ($path === '/health') {
+    Response::json($application->health());
+}
+
+if ($path !== '/') {
+    Response::json([
+        'status' => 'error',
+        'message' => 'Rota não encontrada.',
+    ], 404);
+}
+
+$page = $application->home();
+$health = $application->health();
 $settings = $page['settings'];
 $message = $page['message'];
 $environment = $page['environment'];
 
 $escape = static fn (mixed $value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+header('Content-Type: text/html; charset=utf-8');
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -328,7 +351,7 @@ $escape = static fn (mixed $value): string => htmlspecialchars((string) $value, 
 
     <footer>
         <span>© <?= date('Y') ?> <?= $escape($settings['app_name']) ?></span>
-        <span>Construído com PHP e curiosidade.</span>
+        <span>SQLite conectado · <?= $escape($health['migrations']) ?> migrações aplicadas</span>
     </footer>
 </div>
 </body>

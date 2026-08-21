@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Database;
 
 use App\Support\Clock;
+use App\Support\Env;
 
 final class Seeder
 {
@@ -26,7 +27,7 @@ final class Seeder
                  VALUES (1, :app_name, :tagline, :created_at, :updated_at)'
             );
             $settings->execute([
-                'app_name' => 'Helloword',
+                'app_name' => Env::get('APP_NAME') ?: 'Helloword',
                 'tagline' => 'Um começo pequeno para ideias que vão longe.',
                 'created_at' => $now,
                 'updated_at' => $now,
