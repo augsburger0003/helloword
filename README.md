@@ -1,32 +1,46 @@
-# Helloword
+# Helloword · Mercado Livre
 
-Helloword is a small project workspace that turns a clean repository into a
-usable dashboard. It has a zero-dependency Node.js server, a JSON persistence
-layer with repeatable migrations, a project/task API, and a responsive browser
-interface at `/`.
+Uma experiência de marketplace inspirada no Mercado Livre para explorar
+ofertas, buscar produtos, filtrar por categoria e concluir um carrinho de
+compras. A aplicação roda com Node.js puro, sem servidor de banco externo ou
+dependências adicionais além das ferramentas de desenvolvimento já listadas.
 
-## Requirements
+## Requisitos e inicialização
 
-- Node.js 18 or newer
-- No database server or package installation is required
-
-## Run locally
+- Node.js 18 ou superior
+- Não é necessário instalar ou configurar um banco de dados
 
 ```bash
 npm start
 ```
 
-Open [http://127.0.0.1:3000/](http://127.0.0.1:3000/). The server creates
-`data/database.json` and runs pending migrations on its first start. The data
-directory is intentionally ignored by git.
+Abra [http://127.0.0.1:3000/](http://127.0.0.1:3000/). O servidor serve a
+interface na rota `/`, inicializa `data/database.json` e executa as migrações
+pendentes antes de aceitar requisições. Para desenvolvimento, use
+`npm run dev`, que reinicia o servidor quando os arquivos mudam.
 
-For development, use `npm run dev` to restart the server when source files
-change. `PORT`, `HOST`, and `DATA_DIR` may be supplied as environment
-variables.
+As variáveis `PORT`, `HOST` e `DATA_DIR` podem ser informadas no ambiente.
+`npm run build` gera também o bundle estático do frontend via Vite.
 
-## Demonstration data and admin access
+## O que funciona
 
-Demo bootstrap is explicitly opt-in:
+- Busca por nome, seleção de categorias e ordenação por relevância, preço ou
+  avaliação.
+- Catálogo inicial com produtos, preços, parcelamento, avaliações, estoque e
+  imagens demonstrativas.
+- Favoritos na interface, filtro de localização/condição e feedbacks de
+  localização, ajuda e cadastro.
+- Carrinho persistido com inclusão, remoção, alteração de quantidade e
+  subtotal.
+- Checkout demonstrativo: cria um pedido, baixa o estoque e limpa o carrinho.
+- Modal de acesso e endpoint de autenticação com hash de senha.
+- Layout responsivo para desktop e telas menores.
+
+## Dados demonstrativos e acesso administrativo
+
+O catálogo público é criado idempotentemente no primeiro bootstrap de um banco
+limpo. O acesso administrativo e a massa associada à autenticação são
+**opt-in** e só são habilitados com `DASHBOARDIA_DEMO_MODE=true`:
 
 ```bash
 DASHBOARDIA_DEMO_MODE=true \
@@ -36,27 +50,28 @@ DASHBOARDIA_DEMO_PASSWORD='use-a-local-password' \
 npm start
 ```
 
-When enabled, startup is idempotent: it creates an admin account and a minimum
-workspace of projects, tasks, and activity records only when they do not exist.
-The supplied access is written to `.dashboardia/demo-access.json` with
-`"version": 1`; this directory is ignored and should never be committed.
+O bootstrap lê as três credenciais acima, cria ou atualiza a conta admin com
+senha derivada por `scrypt` e grava `.dashboardia/demo-access.json` com
+`"version": 1`. O arquivo e a senha não devem ser versionados; ambos ficam em
+diretórios ignorados pelo git. O bootstrap é idempotente e seguro para
+reinicializações.
 
-The login endpoint is available at `POST /api/auth/login` with a JSON body
-containing `login` and `password`. The dashboard itself is intentionally
-readable in a local preview so the root route can be reviewed immediately.
+## API principal
 
-## API
+- `GET /api/health` — status do processo e versão do schema.
+- `GET /api/catalog?q=&category=&sort=` — categorias e produtos disponíveis.
+- `GET /api/cart` — carrinho atual com itens, quantidade e subtotal.
+- `POST /api/cart` — adiciona `{ "productId": "...", "quantity": 1 }`.
+- `PATCH /api/cart/:id` — altera a quantidade de um item.
+- `DELETE /api/cart/:id` — remove um item.
+- `POST /api/orders` — cria o pedido demonstrativo e atualiza estoque.
+- `POST /api/auth/login` — autentica `{ "login": "...", "password": "..." }`.
 
-- `GET /api/health` — process and schema health
-- `GET /api/dashboard` — summary, projects with tasks, and recent activity
-- `POST /api/projects` — create a project (`title`, optional `description`)
-- `PATCH /api/tasks/:id` — move a task using `todo`, `in_progress`, or `done`
-- `POST /api/auth/login` — issue an in-memory bearer token for an admin account
+## Persistência
 
-## Persistence and safety
-
-`src/persistence/migrations/001-initial.js` defines the initial schema. The
-database writes through a temporary file and rename, and all inserts/updates
-pass through centralized audit callbacks in `src/persistence/database.js` so
-`createdAt` and `updatedAt` are always present. Seeds use the same insert path,
-including uniqueness checks for admin username and email.
+`src/persistence/migrations/001-initial.js` mantém as coleções legadas e
+`002-marketplace.js` adiciona categorias, produtos, carrinho e pedidos sem
+apagar dados existentes. `src/persistence/database.js` grava primeiro em um
+arquivo temporário e renomeia atomicamente. Inserções e atualizações passam
+por auditoria centralizada, garantindo `createdAt` e `updatedAt`; seeds também
+usam esse caminho e respeitam unicidade de usuário/e-mail e estoque.

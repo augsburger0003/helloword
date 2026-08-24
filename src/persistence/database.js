@@ -3,8 +3,12 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { config } from "../config.js";
 import { up as initialMigration } from "./migrations/001-initial.js";
+import { up as marketplaceMigration } from "./migrations/002-marketplace.js";
 
-const migrations = [{ name: "001-initial", up: initialMigration }];
+const migrations = [
+  { name: "001-initial", up: initialMigration },
+  { name: "002-marketplace", up: marketplaceMigration },
+];
 
 function now() {
   return new Date().toISOString();
@@ -70,6 +74,9 @@ export class Database {
 
   async insert(collection, record, { unique = [] } = {}) {
     assertCollection(this.state[collection]);
+    if (record.id && this.state[collection].some((item) => item.id === record.id)) {
+      throw new Error("O identificador do registro já está em uso.");
+    }
     for (const [field, message] of unique) {
       if (this.state[collection].some((item) => item[field] === record[field])) {
         throw new Error(message || `${field} precisa ser único.`);
@@ -90,6 +97,15 @@ export class Database {
     this.state[collection][index] = entity;
     await this.persist();
     return { ...entity };
+  }
+
+  async remove(collection, id) {
+    assertCollection(this.state[collection]);
+    const index = this.state[collection].findIndex((item) => item.id === id);
+    if (index === -1) return false;
+    this.state[collection].splice(index, 1);
+    await this.persist();
+    return true;
   }
 
   async clear(collection) {

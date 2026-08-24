@@ -2,14 +2,15 @@
   "name": "helloword",
   "version": "1.0.0",
   "private": true,
+  "description": "Uma nova experiência para começar o dia com clareza.",
   "type": "module",
   "scripts": {
-    "start": "vite --host 0.0.0.0",
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0"
+    "preview": "vite preview --host 0.0.0.0",
+    "start": "vite --host 0.0.0.0"
   },
-  "dependencies": {
+  "devDependencies": {
     "vite": "^5.4.10"
   }
 }
