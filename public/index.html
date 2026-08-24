@@ -1,57 +1,42 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Um novo começo para ideias simples." />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Página inicial do projeto helloword" />
     <title>helloword</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <main class="page-shell">
-      <nav class="topbar" aria-label="Navegação principal">
-        <a class="brand" href="/" aria-label="helloword início">
-          <span class="brand-mark" aria-hidden="true">h</span>
-          <span>helloword</span>
-        </a>
-        <a class="topbar-link" href="#sobre">Sobre o projeto <span aria-hidden="true">↗</span></a>
-      </nav>
-
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <p class="eyebrow"><span class="status-dot"></span> Um novo projeto começa aqui</p>
-          <h1 id="hero-title">Hello,<br /><em>world.</em></h1>
-          <p class="intro">
-            Um espaço leve para transformar boas ideias em algo real. Simples,
-            intencional e pronto para o próximo passo.
-          </p>
-          <a class="primary-button" href="#sobre">Conheça o projeto <span aria-hidden="true">→</span></a>
-        </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="orbit orbit-one"></div>
-          <div class="orbit orbit-two"></div>
-          <div class="sun"></div>
-          <div class="spark spark-one">✦</div>
-          <div class="spark spark-two">·</div>
-          <div class="art-label">EST. 2024</div>
-        </div>
-      </section>
-
-      <section class="details" id="sobre" aria-labelledby="details-title">
-        <p class="eyebrow">Por onde começar</p>
-        <h2 id="details-title">Toda jornada começa<br />com uma primeira palavra.</h2>
-        <p class="details-copy">
-          Este é o ponto de partida do helloword: uma base aberta para criar,
-          experimentar e dar forma ao que vem pela frente.
+    <main class="page">
+      <section class="hero" aria-labelledby="title">
+        <span class="eyebrow">PROJETO NOVO</span>
+        <h1 id="title">Olá, mundo<span aria-hidden="true">.</span></h1>
+        <p class="intro">
+          O <strong>helloword</strong> está pronto para começar. Uma base simples,
+          rápida e preparada para evoluir.
         </p>
-        <div class="feature-list">
-          <div class="feature"><span>01</span><strong>Clareza</strong><p>Menos ruído, mais intenção.</p></div>
-          <div class="feature"><span>02</span><strong>Curiosidade</strong><p>Espaço para explorar novas ideias.</p></div>
-          <div class="feature"><span>03</span><strong>Movimento</strong><p>Pequenos passos que levam adiante.</p></div>
-        </div>
+        <a class="button" href="#sobre">Conheça o projeto <span aria-hidden="true">→</span></a>
       </section>
 
-      <footer><span>helloword</span><span>Feito para começar.</span></footer>
+      <section id="sobre" class="details" aria-label="Sobre o projeto">
+        <div class="detail">
+          <span class="detail-number">01</span>
+          <h2>Clareza</h2>
+          <p>Uma experiência direta para dar vida às próximas ideias.</p>
+        </div>
+        <div class="detail">
+          <span class="detail-number">02</span>
+          <h2>Pronto para criar</h2>
+          <p>Estrutura enxuta para você focar no que realmente importa.</p>
+        </div>
+        <div class="detail">
+          <span class="detail-number">03</span>
+          <h2>Em evolução</h2>
+          <p>Este é o primeiro passo de algo ainda maior.</p>
+        </div>
+      </section>
     </main>
+    <footer>helloword <span aria-hidden="true">·</span> início de uma nova história</footer>
   </body>
 </html>

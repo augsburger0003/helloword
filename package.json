@@ -5,6 +5,8 @@
   "description": "Projeto helloword",
   "type": "module",
   "scripts": {
+    "preview": "node server.js",
+    "dev": "node server.js",
     "start": "node server.js",
     "dev": "node server.js",
     "preview": "node server.js"
