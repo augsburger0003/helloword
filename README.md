@@ -1,4 +1,4 @@
-# Helloword · Mercado Livre
+# Mercado Livre · Marketplace demonstrativo
 
 Uma experiência de marketplace inspirada no Mercado Livre para explorar ofertas,
 buscar produtos, filtrar por categoria e concluir um carrinho de compras. A

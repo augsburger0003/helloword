@@ -21,6 +21,9 @@ button, input, select { font: inherit; }
 button { cursor: pointer; }
 .icon { width: 20px; height: 20px; flex: 0 0 auto; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.boot-state { display: grid; min-height: 100vh; place-content: center; gap: 10px; padding: 24px; color: #333; background: var(--yellow); text-align: center; }
+.boot-state strong { font-size: 30px; letter-spacing: -.06em; }
+.boot-state span { color: #555; font-size: 13px; }
 
 .site-header { position: relative; z-index: 4; background: var(--yellow); }
 .top-header, .main-nav, main, .site-footer { width: min(1200px, calc(100% - 48px)); margin: 0 auto; }

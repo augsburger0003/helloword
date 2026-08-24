@@ -23,6 +23,23 @@ const fallbackCatalog = {
   ],
 };
 
+function loadFavorites() {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem('ml-favorites') || '[]');
+    return Array.isArray(stored) ? new Set(stored) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function saveFavorites() {
+  try {
+    window.localStorage.setItem('ml-favorites', JSON.stringify([...state.favorites]));
+  } catch {
+    // Private browsing and sandboxed previews can disable localStorage.
+  }
+}
+
 const state = {
   catalog: { ...fallbackCatalog },
   cart: { items: [], count: 0, subtotal: 0 },
@@ -31,7 +48,7 @@ const state = {
   sort: 'recommended',
   minPrice: '',
   maxPrice: '',
-  favorites: new Set(JSON.parse(localStorage.getItem('ml-favorites') || '[]')),
+  favorites: loadFavorites(),
 };
 
 const money = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -147,7 +164,7 @@ function renderProducts() {
   document.querySelectorAll('[data-favorite]').forEach((button) => button.addEventListener('click', () => {
     const id = button.dataset.favorite;
     state.favorites.has(id) ? state.favorites.delete(id) : state.favorites.add(id);
-    localStorage.setItem('ml-favorites', JSON.stringify([...state.favorites]));
+    saveFavorites();
     renderProducts();
   }));
   document.querySelectorAll('[data-add]').forEach((button) => button.addEventListener('click', () => addToCart(button.dataset.add)));
