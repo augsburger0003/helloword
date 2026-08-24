@@ -1,9 +1,9 @@
 # Helloword · Mercado Livre
 
-Uma experiência de marketplace inspirada no Mercado Livre para explorar
-ofertas, buscar produtos, filtrar por categoria e concluir um carrinho de
-compras. A aplicação roda com Node.js puro, sem servidor de banco externo ou
-dependências adicionais além das ferramentas de desenvolvimento já listadas.
+Uma experiência de marketplace inspirada no Mercado Livre para explorar ofertas,
+buscar produtos, filtrar por categoria e concluir um carrinho de compras. A
+aplicação roda com Node.js puro, sem servidor de banco externo ou dependências
+adicionais além das ferramentas de desenvolvimento já listadas.
 
 ## Requisitos e inicialização
 
@@ -20,7 +20,8 @@ pendentes antes de aceitar requisições. Para desenvolvimento, use
 `npm run dev`, que reinicia o servidor quando os arquivos mudam.
 
 As variáveis `PORT`, `HOST` e `DATA_DIR` podem ser informadas no ambiente.
-`npm run build` gera também o bundle estático do frontend via Vite.
+`npm run build` gera também o bundle estático do frontend via Vite. Para uma
+prévia completa, incluindo API e persistência, use `npm start`.
 
 ## O que funciona
 
