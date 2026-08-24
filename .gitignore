@@ -1,0 +1,6 @@
+node_modules/
+.env
+.dashboardia/
+data/database.json
+data/database.json.tmp
+*.log
