@@ -1,0 +1,15 @@
+{
+  "name": "helloword",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicação Hellword",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "preview": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
