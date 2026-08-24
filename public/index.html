@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f7fb" />
+    <title>HelloWord — Workspace</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <aside class="sidebar">
+        <a class="brand" href="/" aria-label="HelloWord home"><span>h</span> helloword</a>
+        <nav aria-label="Main navigation">
+          <a class="nav-item active" href="#overview"><i>⌂</i> Overview</a>
+          <a class="nav-item" href="#work"><i>◫</i> My work <b id="nav-count">0</b></a>
+          <a class="nav-item" href="#focus"><i>◇</i> Focus</a>
+          <a class="nav-item" href="#activity"><i>◌</i> Activity</a>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="team-card"><span class="team-avatar">H</span><div><strong>Home team</strong><small>Shared workspace</small></div><button aria-label="Team menu">···</button></div>
+          <a class="nav-item" href="#settings"><i>⚙</i> Settings</a>
+        </div>
+      </aside>
+
+      <section class="content">
+        <header class="topbar">
+          <button class="menu-button" id="menu-button" aria-label="Open navigation">☰</button>
+          <div class="crumb"><span>Workspace</span><em>/</em><strong>Overview</strong></div>
+          <div class="top-actions"><button class="icon-button" aria-label="Search">⌕</button><button class="avatar" aria-label="Your profile">MA</button></div>
+        </header>
+
+        <div class="page" id="overview">
+          <section class="hero">
+            <div><p class="eyebrow">MONDAY, APRIL 21</p><h1>Good morning, Maya <span>✦</span></h1><p class="lede">A calm place to keep the important work moving.</p></div>
+            <button class="primary-button" id="open-task-dialog"><span>+</span> Add task</button>
+          </section>
+
+          <section class="metrics" aria-label="Workspace summary">
+            <article class="metric-card lavender"><p>Completion</p><strong id="completion-rate">—</strong><div class="progress"><span id="completion-bar"></span></div><small id="completion-copy">Loading progress</small></article>
+            <article class="metric-card peach"><p>In progress</p><strong id="active-count">—</strong><small>Tasks receiving attention</small><i class="metric-mark">↗</i></article>
+            <article class="metric-card mint"><p>Open tasks</p><strong id="total-count">—</strong><small>Across your workspace</small><i class="metric-mark">◌</i></article>
+          </section>
+
+          <section class="workspace-grid">
+            <section class="panel task-panel" id="work">
+              <div class="panel-heading"><div><p class="section-kicker">YOUR SPACE</p><h2>Things to move forward</h2></div><button class="text-button" id="show-all">View all <span>→</span></button></div>
+              <div class="filters" id="filters"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="in_progress">In progress</button><button class="filter" data-filter="todo">To do</button><button class="filter" data-filter="done">Done</button></div>
+              <div class="task-list" id="task-list" aria-live="polite"><p class="loading">Loading your workspace…</p></div>
+            </section>
+            <aside class="right-column">
+              <section class="panel focus-panel" id="focus"><div class="panel-heading"><div><p class="section-kicker">TODAY'S FOCUS</p><h2>Make room for what matters</h2></div><span class="sun">☼</span></div><p>Pick one meaningful task. Protect the time it needs, then let the rest wait.</p><button class="focus-action" id="focus-first">Start a focus session <span>→</span></button></section>
+              <section class="panel activity-panel" id="activity"><div class="panel-heading"><div><p class="section-kicker">RECENTLY</p><h2>In the flow</h2></div></div><div id="activity-list" class="activity-list"></div></section>
+            </aside>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="task-dialog">
+      <form id="task-form">
+        <div class="dialog-title"><div><p class="section-kicker">NEW TASK</p><h2>Create a small next step</h2></div><button type="button" class="close-dialog" id="close-task-dialog" aria-label="Close">×</button></div>
+        <label>Task title <input required maxlength="140" name="title" placeholder="What needs your attention?" /></label>
+        <label>Notes <textarea name="description" maxlength="500" placeholder="A little context, if it helps"></textarea></label>
+        <div class="form-row"><label>Category <select name="categoryId" id="category-select" required></select></label><label>Priority <select name="priority"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select></label></div>
+        <div class="form-row"><label>Due date <input type="date" name="dueDate" /></label><label>Owner <input name="owner" maxlength="80" placeholder="Maya" /></label></div>
+        <p class="form-error" id="form-error"></p><div class="dialog-actions"><button type="button" class="secondary-button" id="cancel-task">Cancel</button><button class="primary-button" type="submit">Create task</button></div>
+      </form>
+    </dialog>
+    <div class="toast" id="toast" role="status"></div>
+    <script src="/app.js"></script>
+  </body>
+</html>
