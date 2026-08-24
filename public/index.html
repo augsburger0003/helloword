@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Página inicial do projeto helloword">
+    <title>helloword</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172033;
+        --muted: #667085;
+        --primary: #4f46e5;
+        --surface: #ffffff;
+        --background: #f5f7fb;
+        --border: #e5e7eb;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--background);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      }
+
+      .shell { width: min(960px, calc(100% - 40px)); margin: 0 auto; }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 28px 0;
+      }
+
+      .brand { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.04em; }
+      .status { color: #15803d; font-size: .9rem; font-weight: 600; }
+      .status::before { content: "●"; margin-right: 7px; font-size: .7rem; }
+
+      main { padding: 64px 0 80px; }
+      .eyebrow { color: var(--primary); font-size: .8rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+      h1 { max-width: 680px; margin: 14px 0 18px; font-size: clamp(2.7rem, 7vw, 5.6rem); line-height: .98; letter-spacing: -.07em; }
+      .intro { max-width: 560px; color: var(--muted); font-size: 1.1rem; line-height: 1.65; }
+
+      .panel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-top: 52px;
+      }
+
+      .card { padding: 26px; background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 12px 30px rgba(23, 32, 51, .05); }
+      h2 { margin: 0 0 18px; font-size: 1.1rem; }
+      form { display: flex; gap: 10px; }
+      input { min-width: 0; flex: 1; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font: inherit; }
+      button { padding: 12px 17px; border: 0; border-radius: 10px; background: var(--primary); color: white; cursor: pointer; font: inherit; font-weight: 700; }
+      button:hover { background: #4338ca; }
+      ul { display: grid; gap: 12px; padding: 0; margin: 0; list-style: none; }
+      li { padding: 13px 15px; background: #f8f9ff; border-radius: 10px; }
+      .empty { color: var(--muted); }
+      .error { color: #b42318; font-size: .9rem; }
+
+      @media (max-width: 680px) {
+        .panel { grid-template-columns: 1fr; }
+        main { padding-top: 35px; }
+        form { flex-direction: column; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <div class="brand">helloword</div>
+        <div class="status">online</div>
+      </header>
+      <main>
+        <div class="eyebrow">novo começo</div>
+        <h1>Uma base simples para boas ideias.</h1>
+        <p class="intro">O projeto está pronto para evoluir. Explore os dados demonstrativos ou adicione seu primeiro item.</p>
+
+        <div class="panel">
+          <section class="card">
+            <h2>Adicionar item</h2>
+            <form id="item-form">
+              <input id="item-name" name="name" placeholder="Nome do item" autocomplete="off" required>
+              <button type="submit">Adicionar</button>
+            </form>
+            <p id="form-error" class="error" hidden></p>
+          </section>
+          <section class="card">
+            <h2>Itens recentes</h2>
+            <ul id="items"><li class="empty">Carregando...</li></ul>
+          </section>
+        </div>
+      </main>
+    </div>
+    <script>
+      const list = document.querySelector('#items');
+      const form = document.querySelector('#item-form');
+      const input = document.querySelector('#item-name');
+      const error = document.querySelector('#form-error');
+
+      function render(items) {
+        list.innerHTML = '';
+        if (!items.length) {
+          list.innerHTML = '<li class="empty">Nenhum item cadastrado.</li>';
+          return;
+        }
+        items.forEach((item) => {
+          const element = document.createElement('li');
+          element.textContent = item.name;
+          list.appendChild(element);
+        });
+      }
+
+      async function loadItems() {
+        const response = await fetch('/api/items');
+        const data = await response.json();
+        render(data.items);
+      }
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        error.hidden = true;
+        const response = await fetch('/api/items', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: input.value })
+        });
+        if (!response.ok) {
+          error.textContent = 'Não foi possível adicionar o item.';
+          error.hidden = false;
+          return;
+        }
+        input.value = '';
+        loadItems();
+      });
+
+      loadItems().catch(() => {
+        list.innerHTML = '<li class="empty">Não foi possível carregar os itens.</li>';
+      });
+    </script>
+  </body>
+</html>
