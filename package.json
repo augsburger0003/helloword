@@ -1,0 +1,16 @@
+{
+  "name": "helloword",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicação web completa do projeto helloword.",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "preview": "node server.js"
+  }
+}
